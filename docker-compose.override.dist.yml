@@ -1,0 +1,39 @@
+version: '3.4'
+services:
+    apache:
+        ports:
+            - 80:80
+        env_file:
+            - .env
+        depends_on:
+            - php-fpm
+            - mailhog
+
+#    nginx:
+#        ports:
+#            - 80:80
+#        env_file:
+#            - .env
+#        depends_on:
+#            - php-fpm
+#            - mailhog
+
+    database:
+        env_file:
+            - .env
+
+    php-fpm:
+        env_file:
+            - .env
+
+    php-cli:
+        env_file:
+            - .env
+        extra_hosts:
+            - "host.docker.internal:172.17.0.1"
+
+    mailhog:
+        image: mailhog/mailhog
+        container_name: mailhog
+        ports:
+            - 8025:8025

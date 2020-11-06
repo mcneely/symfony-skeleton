@@ -1,0 +1,25 @@
+version: '3.4'
+services:
+    apache:
+        restart: always
+        ports:
+            - 80:44380
+            - 443:443
+
+#    nginx:
+#        restart: always
+#        ports:
+#            - 80:44380
+#            - 443:443
+
+    database:
+        restart: always
+
+    php-fpm:
+        restart: always
+
+    php-cli:
+        restart: always
+
+networks:
+    app:

@@ -1,0 +1,75 @@
+version: '3.4'
+services:
+    apache:
+        build: .docker/apache
+        container_name: apache
+        restart: always
+        ports:
+            - 443:443
+        volumes:
+            - .docker/apache/sites-enabled:/etc/apache2/sites-enabled
+            - .docker/apache/include:/etc/apache2/include
+            - .docker/certs:/etc/http-certs
+            - .:/var/www/
+            - .docker/data/log/apache:/var/log
+        depends_on:
+            - php-fpm
+        networks:
+            - app
+
+#    nginx:
+#        image: nginx:1.17.9
+#        container_name: nginx
+#        restart: always
+#        ports:
+#            - 80:80
+#            - 443:443
+#        volumes:
+#            - .docker/nginx/conf.d:/etc/nginx/conf.d/
+#            - .docker/certs:/etc/http-certs
+#            - .:/var/www/
+#            - .docker/data/log/nginx:/var/log
+#        depends_on:
+#            - php-fpm
+#        networks:
+#            - app
+
+    database:
+        image: mysql:8.0
+        container_name: mysql
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password --disable-log-bin
+        volumes:
+            - .docker/data/mysql:/var/lib/mysql
+            - .docker/data/log/mysql:/var/log
+        ports:
+            - 3306:3306
+        networks:
+            - app
+
+    php-fpm:
+        build: .docker/php/fpm
+        container_name: php-fpm
+        restart: always
+        volumes:
+            - .:/var/www
+            - .docker/data/log/fpm:/var/log
+        depends_on:
+            - php-cli
+            - database
+        networks:
+            - app
+
+    php-cli:
+        build: .docker/php/cli
+        container_name: php-cli
+        restart: always
+        volumes:
+            - .:/var/www
+            - .docker/data/log/cli:/var/log
+        depends_on:
+            - database
+        networks:
+            - app
+networks:
+    app:
